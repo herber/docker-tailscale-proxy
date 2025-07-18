@@ -17,10 +17,12 @@ if [ -z "$DESTINATION_PORT" ]; then
 fi
 
 cleanup() {
-  echo "Stopping tailscaled..."
+  echo "Shutting down tailscaled..."
   tailscale down || true
   kill "$TS_PID" || true
   wait "$TS_PID" || true
+  kill "$PROXY_PID" || true
+  wait "$PROXY_PID" || true
   exit 0
 }
 
@@ -73,4 +75,9 @@ if ! tailscale status; then
   exit 1
 fi
 
-exec "$@"
+# Start HAProxy in background
+haproxy -f /usr/local/etc/haproxy/haproxy.cfg &
+PROXY_PID=$!
+
+# Wait for background processes
+wait "$PROXY_PID"

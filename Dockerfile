@@ -7,8 +7,10 @@ RUN curl -fsSL https://tailscale.com/install.sh | sh
 
 RUN rm -rf /var/lib/apt/lists/*
 
-# Copy cmd script
-COPY cmd.sh /usr/local/bin/cmd.sh
-RUN chmod +x /usr/local/bin/cmd.sh
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["bash", "/usr/local/bin/cmd.sh"]
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
+
+CMD ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]

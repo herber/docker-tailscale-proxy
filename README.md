@@ -91,3 +91,5 @@ Your service will then be reachable inside your Tailscale network as `my-proxy`.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+This is unofficial software and not in any way related to Tailscale.

@@ -12,6 +12,12 @@ This Docker image lets you expose local services from a Docker network to your T
 
 ## Quick Start
 
+### Pull Image
+
+```bash
+docker pull ghcr.io/herber/docker-tailscale-proxy:latest
+```
+
 ### Example
 
 ```yaml
@@ -25,7 +31,7 @@ services:
       - local
 
   tailscale-proxy:
-    image: ghcr.io/your-org/docker-tailscale-proxy:latest
+    image: ghcr.io/herber/docker-tailscale-proxy:latest
     hostname: redis-proxy
     environment:
       TS_AUTHKEY: tskey-abc123

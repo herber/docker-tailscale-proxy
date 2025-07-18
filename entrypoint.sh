@@ -18,7 +18,6 @@ fi
 
 mkdir -p /usr/local/etc/haproxy
 
-# Start with the base haproxy config header and frontend part (without backend servers)
 cat <<EOF > /usr/local/etc/haproxy/haproxy.cfg
 global
     log stdout format raw local0
@@ -53,12 +52,11 @@ done
 tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock &
 TS_PID=$!
 
-# Wait a few seconds for tailscaled to start
 sleep 5
 
 tailscale up --auth-key="$TS_AUTHKEY"
 
-# Optional: check if tailscaled is running
+# Check if tailscale is up and running
 if ! tailscale status; then
   echo "tailscaled did not start properly"
   kill $TS_PID

@@ -16,6 +16,18 @@ if [ -z "$DESTINATION_PORT" ]; then
   exit 1
 fi
 
+cleanup() {
+  echo "Shutting down tailscaled..."
+  tailscale down || true
+  kill "$TS_PID" || true
+  wait "$TS_PID" || true
+  kill "$PROXY_PID" || true
+  wait "$PROXY_PID" || true
+  exit 0
+}
+
+trap cleanup INT TERM
+
 mkdir -p /usr/local/etc/haproxy
 
 cat <<EOF > /usr/local/etc/haproxy/haproxy.cfg
@@ -48,7 +60,7 @@ do
   i=$((i+1))
 done
 
-# Start tailscaled daemon in background
+# Start tailscale daemon
 tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock &
 TS_PID=$!
 
@@ -56,11 +68,13 @@ sleep 5
 
 tailscale up --auth-key="$TS_AUTHKEY"
 
-# Check if tailscale is up and running
 if ! tailscale status; then
   echo "tailscaled did not start properly"
   kill $TS_PID
   exit 1
 fi
 
-exec "$@"
+haproxy -f /usr/local/etc/haproxy/haproxy.cfg &
+PROXY_PID=$!
+
+wait "$PROXY_PID"

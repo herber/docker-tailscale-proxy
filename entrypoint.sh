@@ -16,6 +16,16 @@ if [ -z "$DESTINATION_PORT" ]; then
   exit 1
 fi
 
+cleanup() {
+  echo "Stopping tailscaled..."
+  tailscale down || true
+  kill "$TS_PID" || true
+  wait "$TS_PID" || true
+  exit 0
+}
+
+trap cleanup INT TERM
+
 mkdir -p /usr/local/etc/haproxy
 
 cat <<EOF > /usr/local/etc/haproxy/haproxy.cfg
